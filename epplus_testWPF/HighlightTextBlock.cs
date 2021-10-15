@@ -65,7 +65,7 @@ namespace epplus_testWPF
 
         public static readonly DependencyProperty RichTextProperty =
             DependencyProperty.Register("RichText", typeof(RichTextContainer),
-            typeof(HighlightTextBlock), new FrameworkPropertyMetadata(new RichTextContainer("hoge"), FrameworkPropertyMetadataOptions.AffectsRender,
+            typeof(HighlightTextBlock), new FrameworkPropertyMetadata(new RichTextContainer(), FrameworkPropertyMetadataOptions.AffectsRender,
                 new PropertyChangedCallback(UpdateHighlighting)));
 
         public string HighlightPhrase
@@ -156,14 +156,41 @@ namespace epplus_testWPF
     public class RichTextContainer
     {
         private readonly String richText;
-        public RichTextContainer(string str)
+        
+        List<TextAndColor> richTexts;
+
+        public RichTextContainer()
         {
-            richText = str;
+            richTexts = new List<TextAndColor>();
+            richTexts.Add(new TextAndColor("hoge", Colors.Purple));
+        }
+
+
+        public void add(TextAndColor tac)
+        {
+            richTexts.Add(tac);
+        }
+
+        public void clear()
+        {
+            richTexts.Clear();
         }
 
         public String Text()
         {
             return richText;
+        }
+    }
+
+    public class TextAndColor 
+    {
+        public string text { get; set; }
+        public Color color { get; set; }
+
+        public TextAndColor(string str, Color c)
+        {
+            text = str;
+            color = c;
         }
     }
 

@@ -20,7 +20,7 @@ namespace epplus_testWPF
             String filePath = "..\\..\\..\\test.xlsx";
 
             // test
-            highlightTextBlock.RichText = new RichTextContainer("hoge");
+            highlightTextBlock.RichText = new RichTextContainer();
 
             readExcel(filePath);
         }
