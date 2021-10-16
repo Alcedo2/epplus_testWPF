@@ -7,25 +7,29 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,10,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Height="199" Width="161"/>
-        <local:HighlightTextBlock x:Name="highlightTextBlock" Text="HighlightTextBlock" HighlightPhrase="gh" HorizontalAlignment="Left" Margin="10,237,0,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-
-        <ListView x:Name="listView" ItemsSource="{Binding}" Margin="176,10,10,27">
+        <ListView x:Name="listView" ItemsSource="{Binding}" Margin="10,10,10,10">
 
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="行番号" DisplayMemberBinding="{Binding RowNo}" Width="100"/>
-                    <GridViewColumn Header=" Row1" Width="100">
+                    <GridViewColumn Header="項目名" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Text1}" Background="{Binding bkColor}" Width="80"/>
+                                <TextBlock Text="{Binding Text1}" Background="{Binding bkColor}" Width="80"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header=" Row2" Width="100">
+                    <GridViewColumn Header="列番号" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Text2}" Background="{Binding bkColor}" Width="80"/>
+                                <TextBlock Text="{Binding Text2}" Background="{Binding bkColor}" Width="80"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="値" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <local:MyTextBlock x:Name="MyTextBlock" RichText="{Binding RichText}"  Background="{Binding bkColor}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

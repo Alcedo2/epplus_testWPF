@@ -4,7 +4,7 @@
     xmlns:local="clr-namespace:epplus_testWPF">
 
 
-    <Style TargetType="{x:Type local:HighlightTextBlock}">
+    <Style TargetType="{x:Type local:MyTextBlock}">
         <!--
         <Setter Property="Template">
             <Setter.Value>

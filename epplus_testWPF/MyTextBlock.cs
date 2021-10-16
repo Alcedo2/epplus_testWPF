@@ -39,10 +39,10 @@ namespace epplus_testWPF
     /// 手順 2)
     /// コントロールを XAML ファイルで使用します。
     ///
-    ///     <MyNamespace:HighlightTextBlock/>
+    ///     <MyNamespace:MyTextBlock/>
     ///
     /// </summary>
-    public class HighlightTextBlock : TextBlock
+    public class MyTextBlock : TextBlock
     {
         #region Properties
 
@@ -54,7 +54,7 @@ namespace epplus_testWPF
 
         public new static readonly DependencyProperty TextProperty =
             DependencyProperty.Register("Text", typeof(string),
-            typeof(HighlightTextBlock), new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsRender,
+            typeof(MyTextBlock), new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsRender,
                 new PropertyChangedCallback(UpdateHighlighting)));
 
         public RichTextContainer RichText
@@ -65,7 +65,7 @@ namespace epplus_testWPF
 
         public static readonly DependencyProperty RichTextProperty =
             DependencyProperty.Register("RichText", typeof(RichTextContainer),
-            typeof(HighlightTextBlock), new FrameworkPropertyMetadata(new RichTextContainer(), FrameworkPropertyMetadataOptions.AffectsRender,
+            typeof(MyTextBlock), new FrameworkPropertyMetadata(new RichTextContainer(), FrameworkPropertyMetadataOptions.AffectsRender,
                 new PropertyChangedCallback(UpdateHighlighting)));
 
         public string HighlightPhrase
@@ -76,7 +76,7 @@ namespace epplus_testWPF
 
         public static readonly DependencyProperty HighlightPhraseProperty =
             DependencyProperty.Register("HighlightPhrase", typeof(string),
-            typeof(HighlightTextBlock), new FrameworkPropertyMetadata(String.Empty, FrameworkPropertyMetadataOptions.AffectsRender,
+            typeof(MyTextBlock), new FrameworkPropertyMetadata(String.Empty, FrameworkPropertyMetadataOptions.AffectsRender,
                 new PropertyChangedCallback(UpdateHighlighting)));
 
         public Brush HighlightBrush
@@ -87,7 +87,7 @@ namespace epplus_testWPF
 
         public static readonly DependencyProperty HighlightBrushProperty =
             DependencyProperty.Register("HighlightBrush", typeof(Brush),
-            typeof(HighlightTextBlock), new FrameworkPropertyMetadata(Brushes.Yellow, FrameworkPropertyMetadataOptions.AffectsRender,
+            typeof(MyTextBlock), new FrameworkPropertyMetadata(Brushes.Yellow, FrameworkPropertyMetadataOptions.AffectsRender,
                 new PropertyChangedCallback(UpdateHighlighting)));
 
         public bool IsCaseSensitive
@@ -98,55 +98,35 @@ namespace epplus_testWPF
 
         public static readonly DependencyProperty IsCaseSensitiveProperty =
             DependencyProperty.Register("IsCaseSensitive", typeof(bool),
-            typeof(HighlightTextBlock), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender,
+            typeof(MyTextBlock), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender,
                 new PropertyChangedCallback(UpdateHighlighting)));
 
         private static void UpdateHighlighting(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ApplyHighlight(d as HighlightTextBlock);
+            ApplyTextColor(d as MyTextBlock);
         }
 
         #endregion
 
         #region Members
 
-        private static void ApplyHighlight(HighlightTextBlock tb)
+        private static void ApplyTextColor(MyTextBlock tb)
         {
-            string highlightPhrase = tb.HighlightPhrase;
-            string text = tb.Text;
-
-            if (String.IsNullOrEmpty(highlightPhrase))
+            if (tb.RichText == null || tb.RichText.getTextList() == null) return;
+            tb.Inlines.Clear();
+            foreach (MyFont tac in tb.RichText.getTextList())
             {
-                tb.Inlines.Clear();
-
-                tb.Inlines.Add(text);
-            }
-
-            else
-            {
-                int index = text.IndexOf(highlightPhrase, (tb.IsCaseSensitive) ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
-
-                tb.Inlines.Clear();
-
-                if (index < 0) //if highlightPhrase doesn't exist in text
-                    tb.Inlines.Add(text); //add text, with no background highlighting, to tb.Inlines
-
-                else
-                {
-                    if (index > 0) //if highlightPhrase occurs after start of text
-                        tb.Inlines.Add(text.Substring(0, index)); //add the text that exists before highlightPhrase, with no background highlighting, to tb.Inlines
-
-                    //add the highlightPhrase, using substring to get the casing as it appears in text, with a background, to tb.Inlines
-                    tb.Inlines.Add(new Run(text.Substring(index, highlightPhrase.Length))
+                if(tac.backGroundColor == null)
+                    tb.Inlines.Add(new Run(tac.text)
                     {
-                        Background = tb.HighlightBrush
+                        Foreground = tac.foreGroundColor
                     });
-
-                    index += highlightPhrase.Length; //move index to the end of the matched highlightPhrase
-
-                    if (index < text.Length) //if the end of the matched highlightPhrase occurs before the end of text
-                        tb.Inlines.Add(text.Substring(index)); //add the text that exists after highlightPhrase, with no background highlighting, to tb.Inlines
-                }
+                else
+                    tb.Inlines.Add(new Run(tac.text)
+                    {
+                        Foreground = tac.foreGroundColor,
+                        Background = tac.backGroundColor
+                    });
             }
         }
 
@@ -155,20 +135,27 @@ namespace epplus_testWPF
 
     public class RichTextContainer
     {
-        private readonly String richText;
-        
-        List<TextAndColor> richTexts;
+        List<MyFont> richTexts;
 
         public RichTextContainer()
         {
-            richTexts = new List<TextAndColor>();
-            richTexts.Add(new TextAndColor("hoge", Colors.Purple));
+            richTexts = new List<MyFont>();
         }
 
 
-        public void add(TextAndColor tac)
+        public void add(MyFont tac)
         {
             richTexts.Add(tac);
+        }
+
+        public void add(string str, Brush fc)
+        {
+            richTexts.Add(new MyFont(str, fc));
+        }
+
+        public void add(string str, Brush fc, Brush bc)
+        {
+            richTexts.Add(new MyFont(str, fc, bc));
         }
 
         public void clear()
@@ -176,21 +163,32 @@ namespace epplus_testWPF
             richTexts.Clear();
         }
 
-        public String Text()
+        public List<MyFont> getTextList()
         {
-            return richText;
+            return richTexts;
         }
+
     }
 
-    public class TextAndColor 
+    public class MyFont 
     {
         public string text { get; set; }
-        public Color color { get; set; }
+        public Brush backGroundColor { get; set; }
+        public Brush foreGroundColor { get; set; }
 
-        public TextAndColor(string str, Color c)
+        public MyFont(string str, Brush fore)
         {
             text = str;
-            color = c;
+            backGroundColor = null;
+            foreGroundColor = fore;
+        }
+
+        public MyFont(string str, Brush fore, Brush bk)
+        {
+            text = str;
+            if(bk != null)
+                backGroundColor = bk;
+            foreGroundColor = fore;
         }
     }
 
